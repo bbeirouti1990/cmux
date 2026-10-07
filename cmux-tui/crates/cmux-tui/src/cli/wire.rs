@@ -153,7 +153,7 @@ impl KeyReport {
         Self { key: key.map(str::to_owned), done: std::cell::Cell::new(false) }
     }
 
-    /// Nothing to retry: the mutation succeeded, or the app never ran it.
+    /// A successful mutation has nothing to retry.
     pub(super) fn succeeded(&self) {
         self.done.set(true);
     }
