@@ -1005,7 +1005,14 @@ fn process_name(pid: u32) -> Option<String> {
     (!path.is_empty()).then(|| path.to_string())
 }
 
-#[cfg(not(any(target_os = "linux", target_os = "macos")))]
+/// Windows: the image path, only of a process this daemon started
+/// (`windows_processes`).
+#[cfg(windows)]
+fn process_name(pid: u32) -> Option<String> {
+    crate::windows_processes::image_path(pid)
+}
+
+#[cfg(not(any(target_os = "linux", target_os = "macos", windows)))]
 fn process_name(_pid: u32) -> Option<String> {
     None
 }
@@ -1072,12 +1079,25 @@ fn process_cwd(pid: u32) -> Option<String> {
     (!path.is_empty()).then(|| path.to_owned())
 }
 
-#[cfg(not(any(target_os = "linux", target_os = "macos")))]
+/// Windows: ConPTY has no process group; the newest live descendant of the
+/// shell (a heuristic, `windows_processes::foreground`).
+#[cfg(windows)]
+fn foreground_process_group(pid: u32) -> Option<u32> {
+    crate::windows_processes::foreground(pid)
+}
+
+/// Windows: from the process's PEB, only of a process this daemon started.
+#[cfg(windows)]
+fn process_cwd(pid: u32) -> Option<String> {
+    crate::windows_processes::cwd(pid)
+}
+
+#[cfg(not(any(target_os = "linux", target_os = "macos", windows)))]
 fn foreground_process_group(_pid: u32) -> Option<u32> {
     None
 }
 
-#[cfg(not(any(target_os = "linux", target_os = "macos")))]
+#[cfg(not(any(target_os = "linux", target_os = "macos", windows)))]
 fn process_cwd(_pid: u32) -> Option<String> {
     None
 }

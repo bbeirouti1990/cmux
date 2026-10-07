@@ -78,6 +78,8 @@ mod workspace_registry;
 
 pub mod layout;
 pub mod platform;
+#[cfg(windows)]
+mod windows_processes;
 pub mod process_resources;
 pub mod server;
 pub mod terminal_host;
